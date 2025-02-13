@@ -8,8 +8,15 @@ import { addDialog } from "@/components/ReDialog";
 import type { FormItemProps } from "../utils/types";
 import type { PaginationProps } from "@pureadmin/table";
 import { getKeyList, deviceDetection } from "@pureadmin/utils";
-import { getRoleList, getRoleMenu, getRoleMenuIds } from "@/api/system";
+import { getRoleMenu, getRoleMenuIds } from "@/api/system";
 import { type Ref, reactive, ref, onMounted, h, toRaw, watch } from "vue";
+import {
+  getRoleList,
+  createRole,
+  updateRole,
+  deleteRole,
+  getRoleDetail
+} from "./api";
 
 export function useRole(treeRef: Ref) {
   const form = reactive({
@@ -144,8 +151,10 @@ export function useRole(treeRef: Ref) {
   }
 
   function handleDelete(row) {
-    message(`您删除了角色名称为${row.name}的这条数据`, { type: "success" });
-    onSearch();
+    deleteRole({ id: row.id }).then(() => {
+      message(`您删除了角色名称为${row.name}的这条数据`, { type: "success" });
+      onSearch();
+    });
   }
 
   function handleSizeChange(val: number) {
@@ -163,10 +172,10 @@ export function useRole(treeRef: Ref) {
   async function onSearch() {
     loading.value = true;
     const { data } = await getRoleList(toRaw(form));
-    dataList.value = data.list;
+    dataList.value = data.rows;
     pagination.total = data.total;
-    pagination.pageSize = data.pageSize;
-    pagination.currentPage = data.currentPage;
+    pagination.pageSize = data.size;
+    pagination.currentPage = data.current;
 
     setTimeout(() => {
       loading.value = false;
@@ -179,11 +188,19 @@ export function useRole(treeRef: Ref) {
     onSearch();
   };
 
-  function openDialog(title = "新增", row?: FormItemProps) {
+  async function openDialog(title = "新增", row?: FormItemProps) {
+    let formInline: FormItemProps = null;
+    if (title == "修改") {
+      let res = await getRoleDetail({ id: row.id });
+      if (res.code === 0) {
+        formInline = res.data;
+      }
+    }
     addDialog({
       title: `${title}角色`,
       props: {
         formInline: {
+          id: row?.id ?? "",
           name: row?.name ?? "",
           code: row?.code ?? "",
           remark: row?.remark ?? ""
@@ -194,7 +211,7 @@ export function useRole(treeRef: Ref) {
       fullscreen: deviceDetection(),
       fullscreenIcon: true,
       closeOnClickModal: false,
-      contentRenderer: () => h(editForm, { ref: formRef, formInline: null }),
+      contentRenderer: () => h(editForm, { ref: formRef, formInline }),
       beforeSure: (done, { options }) => {
         const FormRef = formRef.value.getRef();
         const curData = options.props.formInline as FormItemProps;
@@ -205,16 +222,18 @@ export function useRole(treeRef: Ref) {
           done(); // 关闭弹框
           onSearch(); // 刷新表格数据
         }
-        FormRef.validate(valid => {
+        FormRef.validate(async valid => {
           if (valid) {
             console.log("curData", curData);
             // 表单规则校验通过
             if (title === "新增") {
               // 实际开发先调用新增接口，再进行下面操作
-              chores();
+              let res = await createRole(curData);
+              if (res.code === 0) chores();
             } else {
               // 实际开发先调用修改接口，再进行下面操作
-              chores();
+              let res = await updateRole(curData);
+              if (res.code === 0) chores();
             }
           }
         });

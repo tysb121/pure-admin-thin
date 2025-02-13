@@ -2,13 +2,19 @@ import dayjs from "dayjs";
 import editForm from "../form.vue";
 import { handleTree } from "@/utils/tree";
 import { message } from "@/utils/message";
-import { getDeptList } from "@/api/system";
+// import { getDeptList } from "@/api/system";
 import { usePublicHooks } from "../../hooks";
 import { addDialog } from "@/components/ReDialog";
 import { reactive, ref, onMounted, h } from "vue";
 import type { FormItemProps } from "../utils/types";
 import { cloneDeep, isAllEmpty, deviceDetection } from "@pureadmin/utils";
-
+import {
+  getDeptList,
+  createDept,
+  updateDept,
+  deleteDept,
+  getDeptDetail
+} from "./api";
 export function useDept() {
   const form = reactive({
     name: "",
@@ -102,11 +108,19 @@ export function useDept() {
     return newTreeList;
   }
 
-  function openDialog(title = "新增", row?: FormItemProps) {
+  async function openDialog(title = "新增", row?: FormItemProps) {
+    let formInline: FormItemProps = null;
+    if (title == "修改") {
+      let res = await getDeptDetail({ id: row.id });
+      if (res.code === 0) {
+        formInline = res.data;
+      }
+    }
     addDialog({
       title: `${title}部门`,
       props: {
         formInline: {
+          id: row?.id ?? "",
           higherDeptOptions: formatHigherDeptOptions(cloneDeep(dataList.value)),
           parentId: row?.parentId ?? 0,
           name: row?.name ?? "",
@@ -123,7 +137,7 @@ export function useDept() {
       fullscreen: deviceDetection(),
       fullscreenIcon: true,
       closeOnClickModal: false,
-      contentRenderer: () => h(editForm, { ref: formRef, formInline: null }),
+      contentRenderer: () => h(editForm, { ref: formRef, formInline }),
       beforeSure: (done, { options }) => {
         const FormRef = formRef.value.getRef();
         const curData = options.props.formInline as FormItemProps;
@@ -134,16 +148,22 @@ export function useDept() {
           done(); // 关闭弹框
           onSearch(); // 刷新表格数据
         }
-        FormRef.validate(valid => {
+        FormRef.validate(async valid => {
           if (valid) {
             console.log("curData", curData);
             // 表单规则校验通过
             if (title === "新增") {
               // 实际开发先调用新增接口，再进行下面操作
-              chores();
+              let res = await createDept(curData);
+              if (res.code === 0) {
+                chores();
+              }
             } else {
               // 实际开发先调用修改接口，再进行下面操作
-              chores();
+              let res = await updateDept(curData);
+              if (res.code === 0) {
+                chores();
+              }
             }
           }
         });
@@ -152,8 +172,10 @@ export function useDept() {
   }
 
   function handleDelete(row) {
-    message(`您删除了部门名称为${row.name}的这条数据`, { type: "success" });
-    onSearch();
+    deleteDept({ id: row.id }).then(() => {
+      message(`您删除了部门名称为${row.name}的这条数据`, { type: "success" });
+      onSearch();
+    });
   }
 
   onMounted(() => {

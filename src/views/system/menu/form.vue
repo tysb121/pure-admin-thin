@@ -18,9 +18,10 @@ import {
 
 const props = withDefaults(defineProps<FormProps>(), {
   formInline: () => ({
+    id: "",
     menuType: 0,
     higherMenuOptions: [],
-    parentId: 0,
+    parentId: "0",
     title: "",
     name: "",
     path: "",
@@ -34,12 +35,12 @@ const props = withDefaults(defineProps<FormProps>(), {
     activePath: "",
     auths: "",
     frameSrc: "",
-    frameLoading: true,
-    keepAlive: false,
-    hiddenTag: false,
-    fixedTag: false,
-    showLink: true,
-    showParent: false
+    frameLoading: 1,
+    keepAlive: 1,
+    hiddenTag: 0,
+    fixedTag: 0,
+    showLink: 1,
+    showParent: 0
   })
 });
 
@@ -248,13 +249,8 @@ defineExpose({ getRef });
       <re-col v-if="newFormInline.menuType === 1" :value="12" :xs="24" :sm="24">
         <el-form-item label="加载动画">
           <Segmented
-            :modelValue="newFormInline.frameLoading ? 0 : 1"
+            v-model="newFormInline.frameLoading"
             :options="frameLoadingOptions"
-            @change="
-              ({ option: { value } }) => {
-                newFormInline.frameLoading = value;
-              }
-            "
           />
         </el-form-item>
       </re-col>
@@ -267,13 +263,8 @@ defineExpose({ getRef });
       >
         <el-form-item label="菜单">
           <Segmented
-            :modelValue="newFormInline.showLink ? 0 : 1"
+            v-model="newFormInline.showLink"
             :options="showLinkOptions"
-            @change="
-              ({ option: { value } }) => {
-                newFormInline.showLink = value;
-              }
-            "
           />
         </el-form-item>
       </re-col>
@@ -285,13 +276,8 @@ defineExpose({ getRef });
       >
         <el-form-item label="父级菜单">
           <Segmented
-            :modelValue="newFormInline.showParent ? 0 : 1"
+            v-model="newFormInline.showParent"
             :options="showParentOptions"
-            @change="
-              ({ option: { value } }) => {
-                newFormInline.showParent = value;
-              }
-            "
           />
         </el-form-item>
       </re-col>
@@ -299,13 +285,8 @@ defineExpose({ getRef });
       <re-col v-show="newFormInline.menuType < 2" :value="12" :xs="24" :sm="24">
         <el-form-item label="缓存页面">
           <Segmented
-            :modelValue="newFormInline.keepAlive ? 0 : 1"
+            v-model="newFormInline.keepAlive"
             :options="keepAliveOptions"
-            @change="
-              ({ option: { value } }) => {
-                newFormInline.keepAlive = value;
-              }
-            "
           />
         </el-form-item>
       </re-col>
@@ -313,26 +294,16 @@ defineExpose({ getRef });
       <re-col v-show="newFormInline.menuType < 2" :value="12" :xs="24" :sm="24">
         <el-form-item label="标签页">
           <Segmented
-            :modelValue="newFormInline.hiddenTag ? 1 : 0"
+            v-model="newFormInline.hiddenTag"
             :options="hiddenTagOptions"
-            @change="
-              ({ option: { value } }) => {
-                newFormInline.hiddenTag = value;
-              }
-            "
           />
         </el-form-item>
       </re-col>
       <re-col v-show="newFormInline.menuType < 2" :value="12" :xs="24" :sm="24">
         <el-form-item label="固定标签页">
           <Segmented
-            :modelValue="newFormInline.fixedTag ? 0 : 1"
+            v-model="newFormInline.fixedTag"
             :options="fixedTagOptions"
-            @change="
-              ({ option: { value } }) => {
-                newFormInline.fixedTag = value;
-              }
-            "
           />
         </el-form-item>
       </re-col>

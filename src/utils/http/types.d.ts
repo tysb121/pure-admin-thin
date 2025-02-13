@@ -45,3 +45,27 @@ export default class PureHttp {
     config?: PureHttpRequestConfig
   ): Promise<T>;
 }
+
+export type ResultList = {
+  code: number;
+  data?: Array<any>;
+};
+
+export type Result = {
+  code: number;
+  data?: any;
+};
+
+export type ResultTable = {
+  code: number;
+  data?: {
+    /** 列表数据 */
+    rows: Array<any>;
+    /** 总条目数 */
+    total?: number;
+    /** 每页显示条目个数 */
+    size?: number;
+    /** 当前页数 */
+    current?: number;
+  };
+};

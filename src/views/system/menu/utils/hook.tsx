@@ -1,7 +1,13 @@
 import editForm from "../form.vue";
 import { handleTree } from "@/utils/tree";
 import { message } from "@/utils/message";
-import { getMenuList } from "@/api/system";
+import {
+  getMenuList,
+  createMenu,
+  updateMenu,
+  deleteMenu,
+  getMenuDetail
+} from "./api";
 import { addDialog } from "@/components/ReDialog";
 import { reactive, ref, onMounted, h } from "vue";
 import type { FormItemProps } from "../utils/types";
@@ -128,14 +134,22 @@ export function useMenu() {
     return newTreeList;
   }
 
-  function openDialog(title = "新增", row?: FormItemProps) {
+  async function openDialog(title = "新增", row?: FormItemProps) {
+    let formInline: FormItemProps = null;
+    if (title == "修改") {
+      let res = await getMenuDetail({ id: row.id });
+      if (res.code === 0) {
+        formInline = res.data;
+      }
+    }
     addDialog({
       title: `${title}菜单`,
       props: {
         formInline: {
+          id: row?.id ?? "",
           menuType: row?.menuType ?? 0,
           higherMenuOptions: formatHigherMenuOptions(cloneDeep(dataList.value)),
-          parentId: row?.parentId ?? 0,
+          parentId: row?.parentId ?? "0",
           title: row?.title ?? "",
           name: row?.name ?? "",
           path: row?.path ?? "",
@@ -149,12 +163,12 @@ export function useMenu() {
           activePath: row?.activePath ?? "",
           auths: row?.auths ?? "",
           frameSrc: row?.frameSrc ?? "",
-          frameLoading: row?.frameLoading ?? true,
-          keepAlive: row?.keepAlive ?? false,
-          hiddenTag: row?.hiddenTag ?? false,
-          fixedTag: row?.fixedTag ?? false,
-          showLink: row?.showLink ?? true,
-          showParent: row?.showParent ?? false
+          frameLoading: row?.frameLoading ?? 1,
+          keepAlive: row?.keepAlive ?? 1,
+          hiddenTag: row?.hiddenTag ?? 1,
+          fixedTag: row?.fixedTag ?? 0,
+          showLink: row?.showLink ?? 1,
+          showParent: row?.showParent ?? 0
         }
       },
       width: "45%",
@@ -162,7 +176,7 @@ export function useMenu() {
       fullscreen: deviceDetection(),
       fullscreenIcon: true,
       closeOnClickModal: false,
-      contentRenderer: () => h(editForm, { ref: formRef, formInline: null }),
+      contentRenderer: () => h(editForm, { ref: formRef, formInline }),
       beforeSure: (done, { options }) => {
         const FormRef = formRef.value.getRef();
         const curData = options.props.formInline as FormItemProps;
@@ -173,16 +187,18 @@ export function useMenu() {
           done(); // 关闭弹框
           onSearch(); // 刷新表格数据
         }
-        FormRef.validate(valid => {
+        FormRef.validate(async valid => {
           if (valid) {
             console.log("curData", curData);
             // 表单规则校验通过
             if (title === "新增") {
               // 实际开发先调用新增接口，再进行下面操作
-              chores();
+              let res = await createMenu(curData);
+              if (res.code === 0) chores();
             } else {
               // 实际开发先调用修改接口，再进行下面操作
-              chores();
+              let res = await updateMenu(curData);
+              if (res.code === 0) chores();
             }
           }
         });
@@ -191,10 +207,14 @@ export function useMenu() {
   }
 
   function handleDelete(row) {
-    message(`您删除了菜单名称为${row.title}的这条数据`, {
-      type: "success"
+    deleteMenu({ id: row.id }).then(res => {
+      if (res.code === 0) {
+        message(`您删除了菜单名称为${row.title}的这条数据`, {
+          type: "success"
+        });
+        onSearch();
+      }
     });
-    onSearch();
   }
 
   onMounted(() => {

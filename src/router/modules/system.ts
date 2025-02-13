@@ -13,8 +13,8 @@ export default {
       component: () => import("@/views/system/user/index.vue"),
       meta: {
         icon: "ri:admin-line",
-        title: "用户管理",
-        roles: ["admin"]
+        title: "用户管理"
+        // roles: ["admin"]
       }
     },
     {
@@ -23,8 +23,8 @@ export default {
       component: () => import("@/views/system/role/index.vue"),
       meta: {
         icon: "ri:admin-fill",
-        title: "角色管理",
-        roles: ["admin"]
+        title: "角色管理"
+        // roles: ["admin"]
       }
     },
     {
@@ -33,8 +33,8 @@ export default {
       component: () => import("@/views/system/menu/index.vue"),
       meta: {
         icon: "ep:menu",
-        title: "菜单管理",
-        roles: ["admin"]
+        title: "菜单管理"
+        // roles: ["admin"]
       }
     },
     {
@@ -43,8 +43,8 @@ export default {
       component: () => import("@/views/system/dept/index.vue"),
       meta: {
         icon: "ri:git-branch-line",
-        title: "部门管理",
-        roles: ["admin"]
+        title: "部门管理"
+        // roles: ["admin"]
       }
     }
   ]

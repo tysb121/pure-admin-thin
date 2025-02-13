@@ -1,8 +1,9 @@
 interface FormItemProps {
+  id: string;
   /** 菜单类型（0代表菜单、1代表iframe、2代表外链、3代表按钮）*/
   menuType: number;
   higherMenuOptions: Record<string, unknown>[];
-  parentId: number;
+  parentId: string;
   title: string;
   name: string;
   path: string;
@@ -16,12 +17,12 @@ interface FormItemProps {
   activePath: string;
   auths: string;
   frameSrc: string;
-  frameLoading: boolean;
-  keepAlive: boolean;
-  hiddenTag: boolean;
-  fixedTag: boolean;
-  showLink: boolean;
-  showParent: boolean;
+  frameLoading: number;
+  keepAlive: number;
+  hiddenTag: number;
+  fixedTag: number;
+  showLink: number;
+  showParent: number;
 }
 interface FormProps {
   formInline: FormItemProps;
