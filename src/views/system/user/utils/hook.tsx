@@ -24,7 +24,9 @@ import {
   createUser,
   updateUser,
   deleteUser,
-  getUserDetail
+  getUserDetail,
+  bindUserRole,
+  resetPassword
 } from "./api";
 import {
   ElForm,
@@ -43,6 +45,9 @@ import {
   reactive,
   onMounted
 } from "vue";
+
+import * as SM from "sm-crypto";
+const { VITE_SM4_KEY } = import.meta.env;
 
 export function useUser(tableRef: Ref, treeRef: Ref) {
   const form = reactive({
@@ -368,12 +373,14 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
               // 实际开发先调用新增接口，再进行下面操作
               const par = JSON.parse(JSON.stringify(curData));
               par.deptIds = par.deptId ? [par.deptId] : [];
+              par.userPassword = SM.sm4.encrypt(par.userPassword, VITE_SM4_KEY);
               let res = await createUser(par);
               if (res.code === 0) chores();
             } else {
               // 实际开发先调用修改接口，再进行下面操作
               const par = JSON.parse(JSON.stringify(curData));
               par.deptIds = par.deptId ? [par.deptId] : [];
+              delete par.userPassword;
               let res = await updateUser(par);
               if (res.code === 0) chores();
             }
@@ -478,9 +485,17 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
               type: "success"
             });
             console.log(pwdForm.newPwd);
-            // 根据实际业务使用pwdForm.newPwd和row里的某些字段去调用重置用户密码接口即可
-            done(); // 关闭弹框
-            onSearch(); // 刷新表格数据
+            const par = {
+              userId: row.id,
+              password: SM.sm4.encrypt(pwdForm.newPwd, VITE_SM4_KEY)
+            };
+            resetPassword(par).then(res => {
+              if (res.code === 0) {
+                // 根据实际业务使用pwdForm.newPwd和row里的某些字段去调用重置用户密码接口即可
+                done(); // 关闭弹框
+                onSearch(); // 刷新表格数据
+              }
+            });
           }
         });
       }
@@ -510,8 +525,14 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       beforeSure: (done, { options }) => {
         const curData = options.props.formInline as RoleFormItemProps;
         console.log("curIds", curData.ids);
+        const par = {
+          userId: row.id,
+          roleIds: curData.ids
+        };
         // 根据实际业务使用curData.ids和row里的某些字段去调用修改角色接口即可
-        done(); // 关闭弹框
+        bindUserRole(par).then(res => {
+          if (res.code === 0) done(); // 关闭弹框
+        });
       }
     });
   }

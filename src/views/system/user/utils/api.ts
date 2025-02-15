@@ -17,11 +17,19 @@ export const deleteUser = (data?: object) => {
   return http.request<Result>("post", "/user/delete", { data });
 };
 /** 获取用户详情 */
-export const getUserDetail = (data?: object) => {
-  return http.request<Result>("get", "/user/detail", { data });
+export const getUserDetail = (params?: object) => {
+  return http.request<Result>("get", "/user/detail", { params });
 };
 
 /** 系统管理-用户管理-根据userId，获取对应角色id列表（userId：用户id） */
 export const getRoleIds = (data?: object) => {
   return http.request<Result>("post", "/user/list-role-ids", { data });
+};
+
+export const bindUserRole = (data?: object) => {
+  return http.request<Result>("post", "/user/bindUserRole", { data });
+};
+
+export const resetPassword = (data?: object) => {
+  return http.request<Result>("post", "/user/resetPassword", { data });
 };

@@ -1,23 +1,5 @@
 import { http } from "@/utils/http";
-
-type Result = {
-  code: number;
-  data?: Array<any>;
-};
-
-type ResultTable = {
-  code: number;
-  data?: {
-    /** 列表数据 */
-    rows: Array<any>;
-    /** 总条目数 */
-    total?: number;
-    /** 每页显示条目个数 */
-    size?: number;
-    /** 当前页数 */
-    current?: number;
-  };
-};
+import type { Result, ResultTable, ResultList } from "@/utils/http/types";
 
 /** 获取系统管理-用户管理列表 */
 export const getUserList = (data?: object) => {
@@ -26,12 +8,12 @@ export const getUserList = (data?: object) => {
 
 /** 系统管理-用户管理-获取所有角色列表 */
 export const getAllRoleList = () => {
-  return http.request<Result>("get", "/role/list");
+  return http.request<ResultList>("get", "/role/list");
 };
 
 /** 系统管理-用户管理-根据userId，获取对应角色id列表（userId：用户id） */
 export const getRoleIds = (data?: object) => {
-  return http.request<Result>("post", "/list-role-ids", { data });
+  return http.request<ResultList>("post", "/list-role-ids", { data });
 };
 
 /** 获取系统管理-角色管理列表 */
@@ -41,7 +23,7 @@ export const getRoleList = (data?: object) => {
 
 /** 获取系统管理-部门管理列表 */
 export const getDeptList = (data?: object) => {
-  return http.request<Result>("get", "/dept/findAll", { data });
+  return http.request<ResultList>("get", "/dept/findAll", { data });
 };
 
 /** 获取系统监控-在线用户列表 */
@@ -66,15 +48,19 @@ export const getSystemLogsList = (data?: object) => {
 
 /** 获取系统监控-系统日志-根据 id 查日志详情 */
 export const getSystemLogsDetail = (data?: object) => {
-  return http.request<Result>("post", "/system-logs-detail", { data });
+  return http.request<ResultList>("post", "/system-logs-detail", { data });
 };
 
 /** 获取角色管理-权限-菜单权限 */
-export const getRoleMenu = (data?: object) => {
-  return http.request<Result>("post", "/role-menu", { data });
+export const getRoleMenu = (params?: object) => {
+  return http.request<ResultList>("get", "/menu/list", { params });
 };
 
 /** 获取角色管理-权限-菜单权限-根据角色 id 查对应菜单 */
-export const getRoleMenuIds = (data?: object) => {
-  return http.request<Result>("post", "/role-menu-ids", { data });
+export const getRoleMenuIds = (params?: object) => {
+  return http.request<ResultList>("get", "/role/role-menu-ids", { params });
+};
+
+export const updateRoleMenu = (data?: object) => {
+  return http.request<Result>("post", "/role/update-role-menu", { data });
 };

@@ -8,7 +8,7 @@ import { addDialog } from "@/components/ReDialog";
 import type { FormItemProps } from "../utils/types";
 import type { PaginationProps } from "@pureadmin/table";
 import { getKeyList, deviceDetection } from "@pureadmin/utils";
-import { getRoleMenu, getRoleMenuIds } from "@/api/system";
+import { getRoleMenu, getRoleMenuIds, updateRoleMenu } from "@/api/system";
 import { type Ref, reactive, ref, onMounted, h, toRaw, watch } from "vue";
 import {
   getRoleList,
@@ -268,8 +268,15 @@ export function useRole(treeRef: Ref) {
     const { id, name } = curRow.value;
     // 根据用户 id 调用实际项目中菜单权限修改接口
     console.log(id, treeRef.value.getCheckedKeys());
-    message(`角色名称为${name}的菜单权限修改成功`, {
-      type: "success"
+    let menuIds = treeRef.value.getCheckedKeys();
+    updateRoleMenu({
+      roleId: id,
+      menuIds
+    }).then(() => {
+      // isShow.value = false;
+      message(`角色名称为${name}的菜单权限修改成功`, {
+        type: "success"
+      });
     });
   }
 

@@ -15,7 +15,8 @@ import {
 } from "@/api/user";
 import { useMultiTagsStoreHook } from "./multiTags";
 import { type DataInfo, setToken, removeToken, userKey } from "@/utils/auth";
-
+import * as SM from "sm-crypto";
+const { VITE_SM4_KEY } = import.meta.env;
 export const useUserStore = defineStore({
   id: "pure-user",
   state: (): userType => ({
@@ -67,6 +68,8 @@ export const useUserStore = defineStore({
     /** 登入 */
     async loginByUsername(data) {
       return new Promise<UserResult>((resolve, reject) => {
+        let str = SM.sm4.encrypt(data.password, VITE_SM4_KEY);
+        data.password = str;
         getLogin(data)
           .then(data => {
             if (data.code === 0) setToken(data.data);

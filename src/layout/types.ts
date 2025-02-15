@@ -61,7 +61,7 @@ export interface setType {
 }
 
 export type menuType = {
-  id?: number;
+  id?: string;
   name?: string;
   path?: string;
   noShowingChildren?: boolean;
@@ -75,7 +75,7 @@ export type menuType = {
     extraIcon?: string;
   };
   showTooltip?: boolean;
-  parentId?: number;
+  parentId?: string;
   pathList?: number[];
   redirect?: string;
 };
