@@ -17,13 +17,15 @@ import {
   hideTextAtIndex,
   deviceDetection
 } from "@pureadmin/utils";
+import { getDeptList, getAllRoleList } from "@/api/system";
 import {
   getRoleIds,
-  getDeptList,
   getUserList,
-  getAllRoleList
-} from "@/api/system";
-import { createUser, updateUser, deleteUser, getUserDetail } from "./api";
+  createUser,
+  updateUser,
+  deleteUser,
+  getUserDetail
+} from "./api";
 import {
   ElForm,
   ElInput,
@@ -46,7 +48,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   const form = reactive({
     // 左侧部门树的id
     deptId: "",
-    username: "",
+    userName: "",
     phone: "",
     status: ""
   });
@@ -192,7 +194,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       `确认要<strong>${
         row.status === 0 ? "停用" : "启用"
       }</strong><strong style='color:var(--el-color-primary)'>${
-        row.username
+        row.userName
       }</strong>用户吗?`,
       "系统提示",
       {
@@ -276,7 +278,12 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
 
   async function onSearch() {
     loading.value = true;
-    const { data } = await getUserList(toRaw(form));
+    const searchObj = {
+      ...toRaw(form),
+      current: pagination.currentPage,
+      size: pagination.pageSize
+    };
+    const { data } = await getUserList(searchObj);
     dataList.value = data.rows;
     pagination.total = data.total;
     pagination.pageSize = data.size;
@@ -313,11 +320,10 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   }
 
   async function openDialog(title = "新增", row?: FormItemProps) {
-    let formInline: FormItemProps = null;
     if (title == "修改") {
       let res = await getUserDetail({ id: row.id });
       if (res.code === 0) {
-        formInline = res.data;
+        row = res.data;
       }
     }
     addDialog({
@@ -327,10 +333,10 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
           id: row?.id ?? "",
           title,
           higherDeptOptions: formatHigherDeptOptions(higherDeptOptions.value),
-          parentId: row?.dept.id ?? 0,
-          nickname: row?.nickname ?? "",
-          username: row?.username ?? "",
-          password: row?.password ?? "",
+          deptId: row?.dept.id ?? 0,
+          nickName: row?.nickName ?? "",
+          userName: row?.userName ?? "",
+          userPassword: row?.userPassword ?? "",
           phone: row?.phone ?? "",
           email: row?.email ?? "",
           sex: row?.sex ?? "",
@@ -343,12 +349,12 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
       fullscreen: deviceDetection(),
       fullscreenIcon: true,
       closeOnClickModal: false,
-      contentRenderer: () => h(editForm, { ref: formRef, formInline }),
+      contentRenderer: () => h(editForm, { ref: formRef, formInline: null }),
       beforeSure: (done, { options }) => {
         const FormRef = formRef.value.getRef();
         const curData = options.props.formInline as FormItemProps;
         function chores() {
-          message(`您${title}了用户名称为${curData.username}的这条数据`, {
+          message(`您${title}了用户名称为${curData.userName}的这条数据`, {
             type: "success"
           });
           done(); // 关闭弹框
@@ -360,11 +366,15 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
             // 表单规则校验通过
             if (title === "新增") {
               // 实际开发先调用新增接口，再进行下面操作
-              let res = await createUser(curData);
+              const par = JSON.parse(JSON.stringify(curData));
+              par.deptIds = par.deptId ? [par.deptId] : [];
+              let res = await createUser(par);
               if (res.code === 0) chores();
             } else {
               // 实际开发先调用修改接口，再进行下面操作
-              let res = await updateUser(curData);
+              const par = JSON.parse(JSON.stringify(curData));
+              par.deptIds = par.deptId ? [par.deptId] : [];
+              let res = await updateUser(par);
               if (res.code === 0) chores();
             }
           }
@@ -406,7 +416,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
   /** 重置密码 */
   function handleReset(row) {
     addDialog({
-      title: `重置 ${row.username} 用户的密码`,
+      title: `重置 ${row.userName} 用户的密码`,
       width: "30%",
       draggable: true,
       closeOnClickModal: false,
@@ -464,7 +474,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
         ruleFormRef.value.validate(valid => {
           if (valid) {
             // 表单规则校验通过
-            message(`已成功重置 ${row.username} 用户的密码`, {
+            message(`已成功重置 ${row.userName} 用户的密码`, {
               type: "success"
             });
             console.log(pwdForm.newPwd);
@@ -482,11 +492,11 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     // 选中的角色列表
     const ids = (await getRoleIds({ userId: row.id })).data ?? [];
     addDialog({
-      title: `分配 ${row.username} 用户的角色`,
+      title: `分配 ${row.userName} 用户的角色`,
       props: {
         formInline: {
-          username: row?.username ?? "",
-          nickname: row?.nickname ?? "",
+          userName: row?.userName ?? "",
+          nickName: row?.nickName ?? "",
           roleOptions: roleOptions.value ?? [],
           ids
         }

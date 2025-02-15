@@ -14,7 +14,7 @@ export const updateDept = (data?: object) => {
 };
 /** 删除部门 */
 export const deleteDept = (data?: object) => {
-  return http.request<Result>("delete", "/dept/delete", { data });
+  return http.request<Result>("post", "/dept/delete", { data });
 };
 /** 获取部门详情 */
 export const getDeptDetail = (data?: object) => {

@@ -193,7 +193,7 @@ export function useRole(treeRef: Ref) {
     if (title == "修改") {
       let res = await getRoleDetail({ id: row.id });
       if (res.code === 0) {
-        formInline = res.data;
+        row = res.data;
       }
     }
     addDialog({

@@ -1,8 +1,8 @@
 import { http } from "@/utils/http";
 import type { Result, ResultTable } from "@/utils/http/types";
 /** 获取系统管理-用户管理列表 */
-export const getUserList = (data?: object) => {
-  return http.request<ResultTable>("get", "/user/findAll", { data });
+export const getUserList = (params?: object) => {
+  return http.request<ResultTable>("get", "/user/findAll", { params });
 };
 /** 创建用户 */
 export const createUser = (data?: object) => {
@@ -14,9 +14,14 @@ export const updateUser = (data?: object) => {
 };
 /** 删除用户 */
 export const deleteUser = (data?: object) => {
-  return http.request<Result>("delete", "/user/delete", { data });
+  return http.request<Result>("post", "/user/delete", { data });
 };
 /** 获取用户详情 */
 export const getUserDetail = (data?: object) => {
   return http.request<Result>("get", "/user/detail", { data });
+};
+
+/** 系统管理-用户管理-根据userId，获取对应角色id列表（userId：用户id） */
+export const getRoleIds = (data?: object) => {
+  return http.request<Result>("post", "/user/list-role-ids", { data });
 };

@@ -26,7 +26,7 @@ export const getUserList = (data?: object) => {
 
 /** 系统管理-用户管理-获取所有角色列表 */
 export const getAllRoleList = () => {
-  return http.request<Result>("get", "/role/findAll");
+  return http.request<Result>("get", "/role/list");
 };
 
 /** 系统管理-用户管理-根据userId，获取对应角色id列表（userId：用户id） */

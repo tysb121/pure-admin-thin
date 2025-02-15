@@ -3,10 +3,10 @@ interface FormItemProps {
   /** 用于判断是`新增`还是`修改` */
   title: string;
   higherDeptOptions: Record<string, unknown>[];
-  parentId: number;
-  nickname: string;
-  username: string;
-  password: string;
+  deptId: number;
+  nickName: string;
+  userName: string;
+  userPassword: string;
   phone: string | number;
   email: string;
   sex: string | number;
@@ -22,8 +22,8 @@ interface FormProps {
 }
 
 interface RoleFormItemProps {
-  username: string;
-  nickname: string;
+  userName: string;
+  nickName: string;
   /** 角色列表 */
   roleOptions: any[];
   /** 选中的角色列表 */

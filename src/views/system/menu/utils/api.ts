@@ -2,8 +2,8 @@ import { http } from "@/utils/http";
 import type { Result, ResultList } from "@/utils/http/types";
 
 /** 获取系统管理-菜单管理列表 */
-export const getMenuList = (data?: object) => {
-  return http.request<ResultList>("get", "/menu/list", { data });
+export const getMenuList = (params?: object) => {
+  return http.request<ResultList>("get", "/menu/list", { params });
 };
 
 /** 创建菜单 */
@@ -16,9 +16,9 @@ export const updateMenu = (data?: object) => {
 };
 /** 删除菜单 */
 export const deleteMenu = (data?: object) => {
-  return http.request<Result>("delete", "/menu/delete", { data });
+  return http.request<Result>("post", "/menu/delete", { data });
 };
 /** 获取菜单详情 */
-export const getMenuDetail = (data?: object) => {
-  return http.request<Result>("get", "/menu/detail", { data });
+export const getMenuDetail = (params?: object) => {
+  return http.request<Result>("get", "/menu/detail", { params });
 };
