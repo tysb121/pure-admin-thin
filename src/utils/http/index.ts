@@ -18,11 +18,11 @@ const { VITE_BASE_URL } = import.meta.env;
 const defaultConfig: AxiosRequestConfig = {
   // 请求超时时间
   timeout: 10000,
-  headers: {
-    Accept: "application/json, text/plain, */*",
-    "Content-Type": "application/json",
-    "X-Requested-With": "XMLHttpRequest"
-  },
+  // headers: {
+  //   Accept: "application/json, text/plain, */*",
+  //   "Content-Type": "application/json",
+  //   "X-Requested-With": "XMLHttpRequest"
+  // },
   // 数组格式参数序列化（https://github.com/axios/axios/issues/5142）
   paramsSerializer: {
     serialize: stringify as unknown as CustomParamsSerializer

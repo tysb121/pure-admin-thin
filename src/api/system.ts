@@ -64,3 +64,7 @@ export const getRoleMenuIds = (params?: object) => {
 export const updateRoleMenu = (data?: object) => {
   return http.request<Result>("post", "/role/update-role-menu", { data });
 };
+
+export const uploadFile = (data?: object) => {
+  return http.request<Result>("post", "/common/uploadFile", { data });
+};
