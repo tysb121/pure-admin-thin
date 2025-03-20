@@ -68,3 +68,11 @@ export const updateRoleMenu = (data?: object) => {
 export const uploadFile = (data?: object) => {
   return http.request<Result>("post", "/common/uploadFile", { data });
 };
+
+export const uploadFiles = (data?: object) => {
+  return http.request<Result>("post", "/common/uploadFiles", { data });
+};
+
+export const removeFile = (data?: object) => {
+  return http.request<Result>("post", "/common/removeFile", { data });
+};
