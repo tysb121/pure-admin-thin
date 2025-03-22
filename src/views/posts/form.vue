@@ -9,6 +9,8 @@ import ReCol from "@/components/ReCol";
 import { formRules } from "./utils/rule";
 import { FormProps } from "./utils/types";
 import { uploadFile } from "@/api/system";
+import { Plus } from "@element-plus/icons-vue";
+import { UploadProps, ElMessage } from "element-plus";
 // 注册。要在创建编辑器之前注册，且只能注册一次，一定要判断，不可重复注册。
 if (Boot.plugins.length < 13) {
   //判断如果已经插入进去，不在二次插入
@@ -242,6 +244,18 @@ function getRef() {
 }
 
 defineExpose({ getRef });
+
+const handleAvatarUpload: UploadProps["httpRequest"] = async ({ file }) => {
+  // console.log(file);
+  const formData = new FormData();
+  formData.append("file", file);
+  uploadFile(formData).then(res => {
+    if (res.code === 0) {
+      ElMessage.success("上传成功");
+      newFormInline.value.coverUrl = res.data.url;
+    }
+  });
+};
 </script>
 
 <template>
@@ -252,7 +266,7 @@ defineExpose({ getRef });
     label-width="82px"
   >
     <el-row :gutter="30">
-      <re-col :value="12" :xs="24" :sm="24">
+      <re-col :value="8" :xs="24" :sm="24">
         <el-form-item label="文章标题" prop="title">
           <el-input
             v-model="newFormInline.title"
@@ -261,7 +275,7 @@ defineExpose({ getRef });
           />
         </el-form-item>
       </re-col>
-      <re-col :value="12" :xs="24" :sm="24">
+      <re-col :value="8" :xs="24" :sm="24">
         <el-form-item label="文章作者" prop="author">
           <el-input
             v-model="newFormInline.author"
@@ -270,13 +284,33 @@ defineExpose({ getRef });
           />
         </el-form-item>
       </re-col>
-      <re-col :value="12" :xs="24" :sm="24">
+      <re-col :value="8" :xs="24" :sm="24">
         <el-form-item label="分类" prop="classify">
           <el-input
             v-model="newFormInline.classify"
             clearable
             placeholder="请输入分类"
           />
+        </el-form-item>
+      </re-col>
+      <re-col :value="24">
+        <el-form-item label="文章封面" prop="coverUrl">
+          <el-upload
+            class="avatar-uploader"
+            action="#"
+            :auto-upload="true"
+            :show-file-list="false"
+            :http-request="handleAvatarUpload"
+            :limit="1"
+            accept="image/*"
+          >
+            <img
+              v-if="newFormInline.coverUrl"
+              :src="newFormInline.coverUrl"
+              class="avatar"
+            />
+            <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+          </el-upload>
         </el-form-item>
       </re-col>
       <re-col :value="24" :xs="24" :sm="24">
@@ -307,3 +341,10 @@ defineExpose({ getRef });
     </el-row>
   </el-form>
 </template>
+<style lang="scss" scoped>
+.avatar-uploader .avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
+}
+</style>

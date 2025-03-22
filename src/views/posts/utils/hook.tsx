@@ -133,7 +133,8 @@ export function useWebsite() {
           classify: row?.classify ?? ""
         }
       },
-      width: "45%",
+      width: "55%",
+      top: "5vh",
       draggable: true,
       fullscreen: deviceDetection(),
       fullscreenIcon: true,

@@ -75,8 +75,12 @@
               :before-remove="handleRemove"
               list-type="picture"
               :auto-upload="false"
+              accept="image/*,video/*"
             >
               <el-button type="primary">上传背景图片</el-button>
+              <!-- <template #file="{ file }">
+                <div>11</div>
+              </template> -->
               <!-- <template #tip>
                 <div class="el-upload__tip">
                   jpg/png files with a size less than 500kb
@@ -102,6 +106,10 @@
       </el-row>
     </el-form>
   </el-card>
+
+  <el-dialog v-model="dialogVisible" title="图片预览">
+    <img w-full :src="dialogImageUrl" alt="Preview Image" />
+  </el-dialog>
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
@@ -125,6 +133,8 @@ import {
   updateWebConfig
 } from "./utils/api";
 
+const dialogVisible = ref(false);
+const dialogImageUrl = ref("");
 const loading = ref(false);
 const imageUrl = ref("");
 const ruleFormRef = ref();
@@ -176,6 +186,7 @@ const handleRemove: UploadProps["beforeRemove"] = (uploadFile, uploadFiles) => {
   console.log(uploadFile, uploadFiles);
   return ElMessageBox.confirm(`确定要删除该文件${uploadFile.name} 吗?`).then(
     async () => {
+      if (!uploadFile.id) return;
       const r = await removeFile({ fileId: uploadFile.id });
       if (r.code === 0) {
         ElMessage.success("删除成功");
@@ -188,6 +199,8 @@ const handleRemove: UploadProps["beforeRemove"] = (uploadFile, uploadFiles) => {
 
 const handlePreview: UploadProps["onPreview"] = file => {
   console.log(file);
+  dialogImageUrl.value = file.url!;
+  dialogVisible.value = true;
 };
 
 function getRef() {
